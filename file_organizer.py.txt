@@ -1,0 +1,105 @@
+import os
+import argparse
+import shutil
+from pathlib import Path
+
+#(possible categores based on extensions)
+Categories={
+    "Images": [".jpg", ".jpeg", ".png", ".gif"],
+    "Videos": [".mp4", ".mkv", ".avi"],
+    "Documents": [".pdf", ".docx", ".txt", ".pptx", ".xlsx"],
+    "Audio": [".mp3", ".wav"],
+    "Archives": [".zip", ".rar", ".7z"]
+}
+
+def get_category(file_extensions):
+    for category,extensions in Categories.items():
+        if file_extensions in extensions:
+            return category
+    return "Others"
+def organize_file(folder_path ,mode):
+    folder=Path(folder_path)
+
+        #{checking for folsder}
+    if not folder.exists():
+        print("ERROR:folder does not exist")
+        exit()
+    if not folder.is_dir():
+        print("ERROR:path is not a folder")
+        exit()
+
+    print(f" Organizing files in: {folder}")
+    print(f" Mode selected: {mode}\n")
+
+    for item in folder.iterdir():
+        if item.is_dir():
+            continue
+
+        file_extension=item.suffix.lower()
+        category = get_category(file_extension)
+
+               category_folder = folder / category
+        category_folder.mkdir(exist_ok=True)
+
+        destination = category_folder / item.name
+
+        try:
+            if mode == "move":
+                shutil.move(str(item), str(destination))
+                print(f" Moved: {item.name} → {category}/")
+
+            elif mode == "copy":
+                shutil.copy2(str(item), str(destination))
+                print(f" Copied: {item.name} → {category}/")
+
+        except FileExistsError:
+            print(f" File already exists: {item.name}")
+        except PermissionError:
+            print(f" Permission denied: {item.name}")
+        except Exception as e:
+            print(f"Error with {item.name}: {e}")
+
+    print("\n Organization completed!")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="CLI File Organizer - Organize files by type"
+        "Example usage:\n"
+        "python file_organizer.py --path \"C:/Users/Shaili/Downloads\" --mode move"
+  
+    )
+
+    parser.add_argument(
+        "--path",
+        required=True,
+        help="Path of the folder to organize,"
+    )
+
+    parser.add_argument(
+        "--mode",
+        choices=["move", "copy"],
+        default="move",
+        help="Choose 'move' or 'copy' (default: move)"
+    )
+
+    args = parser.parse_args()
+    organize_file(args.path, args.mode)
+
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+

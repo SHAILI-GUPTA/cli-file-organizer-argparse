@@ -38,7 +38,7 @@ def organize_file(folder_path ,mode):
         file_extension=item.suffix.lower()
         category = get_category(file_extension)
 
-               category_folder = folder / category
+        category_folder = folder / category
         category_folder.mkdir(exist_ok=True)
 
         destination = category_folder / item.name
@@ -90,6 +90,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
